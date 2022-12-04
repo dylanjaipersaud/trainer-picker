@@ -43,14 +43,22 @@
             :rules="passwordRules"
             type="password"
           ></v-text-field>
-          <v-btn @click="validate" width="50%" outlined color="#050A30" style="align-self: center;">Submit</v-btn>
+          <v-btn
+            @click="validate"
+            width="50%"
+            outlined
+            color="#050A30"
+            style="align-self: center"
+            >Submit</v-btn
+          >
         </v-form>
         <br />
         <br />
         <h4>
-          <i>Forgot your password? </i> 
+          <i>Forgot your password? </i>
           <v-btn text> Click here!</v-btn>
         </h4>
+        <!-- <div>Store: {{$refs.store.isLoggedIn}}</div> -->
         <!-- <v-spacer></v-spacer>
         <div>Pic</div> -->
       </div>
@@ -59,23 +67,44 @@
 </template>
 
 <script>
+import axios from "axios";
+// import { store } from "./src/store.js";
+
 export default {
   data: () => ({
     valid: true,
     email: null,
     password: null,
 
+    // (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
     emailRules: [
       (v) => !!v || "E-mail is required",
-      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+      
     ],
     passwordRules: [(v) => !!v || "Password is required"],
   }),
 
   methods: {
     validate() {
+      var authorizationBasic = window.btoa(this.email + ':' + this.password);
+      console.log(authorizationBasic);
       if (this.$refs.form.validate()) {
-        alert("Clicked Logged in");
+        axios
+          .post(
+            "http://localhost:8000/api-token-auth/",
+            {
+                username: this.email,
+                password: this.password,
+            },
+            // {headers: { Authorization: `Bearer ${authorizationBasic}`}}
+          )
+          .then(function (resp) {
+            console.log(resp);
+            this.$refs.store.isLoggedIn = true;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       } else {
         alert("Login failed, please try again.");
       }
@@ -119,7 +148,6 @@ export default {
   height: 100%;
   width: 40%;
   background-color: whitesmoke;
-
   box-shadow: inset 11px 11px 5px #dadada;
 }
 </style>
