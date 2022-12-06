@@ -1,53 +1,97 @@
 <template>
   <div class="set-main">
-    <h1>Sessions</h1>
+    <h1>Classes</h1>
     <br />
     <v-sheet height="500">
       <v-calendar :now="today" :value="today" color="primary">
         <template v-slot:day="{ past, date }">
-          <v-row class="fill-height">
-            <template v-if="!past && tracked[date]">
-              <v-sheet
-                v-for="(percent, i) in tracked[date]"
-                :key="i"
-                :title="`${category[i]} ${percent}%`"
-                :color="colors[i]"
-                :width="`${percent}%`"
-                height="100%"
-                tile
-                @click="clickDialog(date)"
-              ></v-sheet>
+          <v-row style="display: flex; justify-content: center">
+            <template v-if="!past && checkDate(date)">
+              <router-link :to="{ name: 'GroupclassInfoPage', params: {date: date} }">
+                <v-img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Running_icon_-_Noun_Project_17825.svg/1200px-Running_icon_-_Noun_Project_17825.svg.png"
+                max-height="50px"
+                max-width="50px"
+                style="display: flex; justify-content: center; margin-top: 10px"
+              ></v-img>
+              </router-link>
+              <!-- </v-sheet> -->
             </template>
           </v-row>
         </template>
       </v-calendar>
     </v-sheet>
+    <!-- {{ groupclass }}
+    <br> -->
+    <!-- {{groupclass_items}} -->
   </div>
 </template>
 
 <script>
+import moment from "moment";
+// import axios from "axios";
+
 export default {
   data: () => ({
     //   today: '2022-12-04',
-    today: "2019-01-10",
+    today: moment().format("YYYY[-]MM[-]DD"),
     tracked: {
-      "2019-01-19": [23, 45, 10],
-      "2019-01-18": [10],
-      "2019-01-17": [0, 78, 5],
-      "2019-01-16": [0, 0, 50],
-      "2019-01-15": [0, 10, 23],
-      "2019-01-04": [2, 90],
-      "2019-01-03": [10, 32],
-      "2019-01-02": [80, 10, 10],
-      "2019-01-01": [20, 25, 10],
+      "2022-11-28": [2, 2],
+      "2022-12-03": [2, 2],
+      "2022-12-05": [2, 2],
+      "2022-12-15": [2, 2],
+      "2022-12-17": [2, 2],
+      "2022-12-25": [2, 2],
     },
-    colors: ["#1867c0", "#fb8c00", "#000000"],
-    category: ["Development", "Meetings", "Slacking"],
   }),
+  computed:{
+    groupclass_items: function (){
+      return this.$store.getters.groupclass_items;
+    }
+  },
+  mounted() {
+    this.$store
+      .dispatch("getGroupclass")
+      .then((resp) => {
+        window.console.log(resp);
+      })
+    // this.getData();
+  },
   methods: {
-    clickDialog(date) {
-      alert(date);
-    },
+    checkDate(date){
+      console.log(moment(date).isSame(moment("2022-11-30T12:00:00Z")));
+      // moment(date).isSame(this.groupclass_items[i].dateTime)
+      for(let i = 0; i < this.groupclass_items.length; i++){
+        console.log(date);
+        console.log(String(this.groupclass_items[1].dateTime).substring(0,10));
+        if(moment(date).isSame(moment(String(this.groupclass_items[i].dateTime).substring(0,10)))){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+    }
+    // formatGroupclass(){
+    //   for(let i = 0; i < this.groupclass_items.length; i++){
+        
+    //   }
+    // }
+    // selectGroupclass() {
+    //   alert("hello");
+    // },
+
+  // getData(){
+  //   let self = this;
+  //   axios
+  //     .get(
+  //       "http://localhost:8000/groupclass/",
+  //       {headers: { Authorization: `Token 514694818037db5a7559b6d548c277054f021ddd`}}
+  //     )
+  //     .then(function (resp) {
+  //       self.groupclass = resp.data;
+  //     });
+  // }
   },
 };
 </script>
